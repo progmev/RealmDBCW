@@ -58,7 +58,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Categories" id="9mj-dq-jck">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Y6z-dA-bLZ"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Y6z-dA-bLZ">
+                            <connections>
+                                <action selector="addButtonPress:" destination="Exb-Zo-29O" id="nGQ-10-Tvd"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tFU-t2-Q2I" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -106,7 +110,11 @@
                     </tableView>
                     <navigationItem key="navigationItem" id="qPA-Jd-Nsy">
                         <rightBarButtonItems>
-                            <barButtonItem systemItem="add" id="Ppa-gd-SM3"/>
+                            <barButtonItem systemItem="add" id="Ppa-gd-SM3">
+                                <connections>
+                                    <action selector="addTask:" destination="vGk-gX-Nck" id="UAI-6i-6xw"/>
+                                </connections>
+                            </barButtonItem>
                             <barButtonItem systemItem="edit" id="VKM-P7-PGh"/>
                         </rightBarButtonItems>
                     </navigationItem>

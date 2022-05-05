@@ -6,40 +6,43 @@
 //
 
 import UIKit
+import RealmSwift
 
 class TasksListsTVC: UITableViewController {
+    
+    // Result - отображает данные в реальном времени
+    var tasksLists: Results<TaskList>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        // Claer DB
+        //StorageManager.deleteAll()
+        
+        // выборка из БД + сортировка
+        tasksLists = realm.objects(TaskList.self)
+        
+    }
+    
+    @IBAction func addButtonPress(_ sender: UIBarButtonItem) {
+        allertForAddingList()
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        tasksLists.count
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
-        // Configure the cell...
+        let taskList = tasksLists[indexPath.row]
+        cell.textLabel?.text = taskList.name
+        cell.detailTextLabel?.text = String(taskList.tasks.count)
 
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.
@@ -76,14 +79,43 @@ class TasksListsTVC: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        guard let dvc = segue.destination as? TasksTVC,
+        let indexPath = tableView.indexPathForSelectedRow else { return }
+        dvc.currentTasksList = tasksLists[indexPath.row]
     }
-    */
-
+    
+    private func allertForAddingList() {
+        let title = "New list"
+        let messege = "Plese insert new list name"
+        let buttonTitle = "Save"
+        
+        let alert = UIAlertController(title: title, message: messege, preferredStyle: .alert)
+        
+        let saveAction = UIAlertAction(title: buttonTitle, style: .default) { _ in
+            guard let textField = alert.textFields?.first,
+                      let name = textField.text else { return }
+            
+            let taskList = TaskList()
+            taskList.name = name
+            
+            StorageManager.saveTaskList(taskList: taskList)
+            
+            self.tableView.insertRows(at: [IndexPath(row: self.tasksLists.count - 1, section: 0)], with: .automatic)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        
+        alert.addTextField { textField in
+            textField.placeholder = "List name"
+        }
+        
+        present(alert, animated: true)
+    }
 }

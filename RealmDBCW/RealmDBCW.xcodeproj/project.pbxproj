@@ -18,6 +18,7 @@
 		2DCD5167281B02F200288BD3 /* TaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD5166281B02F200288BD3 /* TaskList.swift */; };
 		2DCD5169281B04F400288BD3 /* TasksListsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD5168281B04F400288BD3 /* TasksListsTVC.swift */; };
 		2DCD516B281B050E00288BD3 /* TasksTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD516A281B050E00288BD3 /* TasksTVC.swift */; };
+		2DCD516E281B0A9A00288BD3 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD516D281B0A9A00288BD3 /* StorageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		2DCD5166281B02F200288BD3 /* TaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskList.swift; sourceTree = "<group>"; };
 		2DCD5168281B04F400288BD3 /* TasksListsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksListsTVC.swift; sourceTree = "<group>"; };
 		2DCD516A281B050E00288BD3 /* TasksTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTVC.swift; sourceTree = "<group>"; };
+		2DCD516D281B0A9A00288BD3 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 		2DCD5146281B004900288BD3 /* RealmDBCW */ = {
 			isa = PBXGroup;
 			children = (
+				2DCD516C281B0A8100288BD3 /* Managers */,
 				2DCD5161281B010600288BD3 /* Models */,
 				2DCD5163281B012300288BD3 /* Controllers */,
 				2DCD5160281B00FE00288BD3 /* Views */,
@@ -110,6 +113,14 @@
 				2DCD516A281B050E00288BD3 /* TasksTVC.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		2DCD516C281B0A8100288BD3 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				2DCD516D281B0A9A00288BD3 /* StorageManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -193,6 +204,7 @@
 				2DCD5165281B02D000288BD3 /* Task.swift in Sources */,
 				2DCD5167281B02F200288BD3 /* TaskList.swift in Sources */,
 				2DCD516B281B050E00288BD3 /* TasksTVC.swift in Sources */,
+				2DCD516E281B0A9A00288BD3 /* StorageManager.swift in Sources */,
 				2DCD5148281B004900288BD3 /* AppDelegate.swift in Sources */,
 				2DCD514A281B004900288BD3 /* SceneDelegate.swift in Sources */,
 				2DCD5169281B04F400288BD3 /* TasksListsTVC.swift in Sources */,

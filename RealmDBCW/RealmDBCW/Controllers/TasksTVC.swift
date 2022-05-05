@@ -6,29 +6,75 @@
 //
 
 import UIKit
+import RealmSwift
 
 class TasksTVC: UITableViewController {
-
+    
+    var currentTasksList: TaskList!
+    
+    private var inComlete: Results<Task>!
+    private var comletedTasks: Results<Task>!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        title = currentTasksList.name
+        
+//        tasksLists = realm.objects(Task.self)
     }
 
+    @IBAction func addTask(_ sender: UIBarButtonItem) {
+        
+        let title = "New task"
+        let messege = "Plese insert new task name"
+        let buttonTitle = "Save"
+        
+        let alert = UIAlertController(title: title, message: messege, preferredStyle: .alert)
+        
+        let saveAction = UIAlertAction(title: buttonTitle, style: .default) { _ in
+            guard let textFieldName = alert.textFields?.first,
+                  let name = textFieldName.text,
+                  let textFieldNote = alert.textFields?.last,
+                  let note = textFieldNote.text else { return }
+            
+            let task = Task()
+            task.name = name
+            task.note = note
+            
+            StorageManager.saveNewTask(taskList: self.currentTasksList, task: task)
+            
+            self.tableView.reloadData()
+            
+//            self.tableView.insertRows(at: [IndexPath(row: self.tasksLists.count - 1, section: 0)], with: .automatic)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Task name"
+        }
+        alert.addTextField { textField in
+            textField.placeholder = "Task note"
+        }
+        
+        present(alert, animated: true)
+        
+    }
+    
+    
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        0//2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        0//section == 0 ? inComlete.count : comletedTasks.count
     }
 
     /*
@@ -57,7 +103,7 @@ class TasksTVC: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
     */
 
