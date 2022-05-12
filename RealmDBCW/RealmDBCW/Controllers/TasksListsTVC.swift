@@ -23,7 +23,7 @@ class TasksListsTVC: UITableViewController {
         // выборка из БД + сортировка
         tasksLists = realm.objects(TaskList.self)
         
-        addTasksListsObserver()
+        //addTasksListsObserver()
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBarButtonSystemItemSelector))
         self.navigationItem.setRightBarButtonItems([addButton, editButtonItem], animated: true)
@@ -160,10 +160,20 @@ class TasksListsTVC: UITableViewController {
                         }
                         self.tableView.reloadRows(at: indexPathArray, with: .automatic)
                     }
-                    
-                    // TODO: - deletions
-                    
-                    // TODO: - insertions
+                    if !deletions.isEmpty {
+                        var indexPathArray = [IndexPath]()
+                        for row in deletions {
+                            indexPathArray.append(IndexPath(row: row, section: 0))
+                        }
+                        self.tableView.deleteRows(at: indexPathArray, with: .automatic)
+                    }
+                    if !insertions.isEmpty {
+                        var indexPathArray = [IndexPath]()
+                        for row in insertions {
+                            indexPathArray.append(IndexPath(row: row, section: 0))
+                        }
+                        self.tableView.insertRows(at: indexPathArray, with: .automatic)
+                    }
                     
                 case .error(let error) :
                     print("error notification: \(error)")

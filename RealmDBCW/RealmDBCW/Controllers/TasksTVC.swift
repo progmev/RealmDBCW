@@ -108,4 +108,32 @@ class TasksTVC: UITableViewController {
         cell.detailTextLabel?.text = task.note
         return cell
     }
+    
+    // MARK: - Table view delegate
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let task = indexPath.section == 0 ? notCompletedTasks[indexPath.row] : completedTasks[indexPath.row]
+
+        let deleteContextItem = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
+            StorageManager.deleteTask(task: task)
+            self.filteringTasks()
+        }
+
+        let editContextItem = UIContextualAction(style: .destructive, title: "Edit") { _, _, _ in
+            self.alertForAddAndUpdateTask(task)
+        }
+
+        let doneText = task.isComplete ? "Not done" : "Done"
+        let doneContextItem = UIContextualAction(style: .destructive, title: doneText) { _, _, _ in
+            StorageManager.makeDone(task: task)
+            self.filteringTasks()
+        }
+
+        editContextItem.backgroundColor = .orange
+        doneContextItem.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+
+        let swipeActions = UISwipeActionsConfiguration(actions: [deleteContextItem, editContextItem, doneContextItem])
+
+        return swipeActions
+    }
 }
