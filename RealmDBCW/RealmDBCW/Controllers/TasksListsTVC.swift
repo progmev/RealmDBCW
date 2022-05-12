@@ -12,6 +12,7 @@ class TasksListsTVC: UITableViewController {
     
     // Result - отображает данные в реальном времени
     var tasksLists: Results<TaskList>!
+    var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,10 +23,26 @@ class TasksListsTVC: UITableViewController {
         // выборка из БД + сортировка
         tasksLists = realm.objects(TaskList.self)
         
+        addTasksListsObserver()
+        
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBarButtonSystemItemSelector))
+        self.navigationItem.setRightBarButtonItems([addButton, editButtonItem], animated: true)
+        
     }
     
-    @IBAction func addButtonPress(_ sender: UIBarButtonItem) {
-        allertForAddingList()
+    @IBAction func sortingSegmentedControl(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            tasksLists = tasksLists.sorted(byKeyPath: "name")
+        } else {
+            tasksLists = tasksLists.sorted(byKeyPath: "date")
+        }
+        tableView.reloadData()
+    }
+    
+    @objc private func addBarButtonSystemItemSelector() {
+        allertForAddAndUpdatesListTasks() {
+            print("Added new list")
+        }
     }
 
     // MARK: - Table view data source
@@ -38,46 +55,41 @@ class TasksListsTVC: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
         let taskList = tasksLists[indexPath.row]
-        cell.textLabel?.text = taskList.name
-        cell.detailTextLabel?.text = String(taskList.tasks.count)
+        cell.configure(with: taskList)
 
         return cell
     }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
+    
+    // MARK: - Table view delegate
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let currentList = tasksLists[indexPath.row]
+    
+        let deleteContextItem = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
+            StorageManager.deleteList(taskList: currentList)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
+        
+        let editContextItem = UIContextualAction(style: .destructive, title: "Edit") { _, _, _ in
+            self.allertForAddAndUpdatesListTasks(currentList) {
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+        }
+        
+        let doneContextItem = UIContextualAction(style: .destructive, title: "All Done") { _, _, _ in
+            StorageManager.makeAllDone(taskList: currentList)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+        
+        deleteContextItem.backgroundColor = .red
+        editContextItem.backgroundColor = .orange
+        
+        let swipeActions = UISwipeActionsConfiguration(actions: [deleteContextItem,
+                                                                 editContextItem,
+                                                                 doneContextItem])
+        
+        return swipeActions
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     // MARK: - Navigation
 
@@ -87,35 +99,76 @@ class TasksListsTVC: UITableViewController {
         dvc.currentTasksList = tasksLists[indexPath.row]
     }
     
-    private func allertForAddingList() {
-        let title = "New list"
-        let messege = "Plese insert new list name"
-        let buttonTitle = "Save"
+    private func allertForAddAndUpdatesListTasks(_ tasksList: TaskList? = nil,
+                                                 completion: @escaping () -> Void) {
+        let title = tasksList == nil ? "New list" : "Edit list"
+        let messege = "Plese insert list name"
+        let buttonTitle = tasksList == nil ? "Save" : "Update"
         
         let alert = UIAlertController(title: title, message: messege, preferredStyle: .alert)
         
-        let saveAction = UIAlertAction(title: buttonTitle, style: .default) { _ in
-            guard let textField = alert.textFields?.first,
-                      let name = textField.text else { return }
+        var alertTextField: UITextField!
+        
+        let saveUpdateAction = UIAlertAction(title: buttonTitle, style: .default) { _ in
             
-            let taskList = TaskList()
-            taskList.name = name
+            guard let newListName = alertTextField.text, !newListName.isEmpty else { return }
             
-            StorageManager.saveTaskList(taskList: taskList)
-            
-            self.tableView.insertRows(at: [IndexPath(row: self.tasksLists.count - 1, section: 0)], with: .automatic)
+            if let tasksList = tasksList {
+                StorageManager.editList(taskList: tasksList,
+                                        newTaskListName: newListName)
+                completion()
+            } else {
+                let taskList = TaskList()
+                taskList.name = newListName
+                StorageManager.saveTaskList(taskList: taskList)
+                self.tableView.insertRows(at: [IndexPath(row: self.tasksLists.count - 1, section: 0)], with: .automatic)
+            }
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
         
-        
-        alert.addAction(saveAction)
+        alert.addAction(saveUpdateAction)
         alert.addAction(cancelAction)
         
         alert.addTextField { textField in
+            alertTextField = textField
+            if let listName = tasksList {
+                alertTextField.text = listName.name
+            }
             textField.placeholder = "List name"
         }
         
         present(alert, animated: true)
+    }
+    
+    private func addTasksListsObserver() {
+        
+        notificationToken = tasksLists.observe({ change in
+            switch change {
+                case .initial:
+                    print("initial element")
+                case .update(_, let deletions, let insertions, let modifications):
+                    
+                    print("deletions: \(deletions)")
+                    print("insertions: \(insertions)")
+                    print("modifications: \(modifications)")
+                    
+                    if !modifications.isEmpty {
+                        var indexPathArray = [IndexPath]()
+                        for row in modifications {
+                            indexPathArray.append(IndexPath(row: row, section: 0))
+                        }
+                        self.tableView.reloadRows(at: indexPathArray, with: .automatic)
+                    }
+                    
+                    // TODO: - deletions
+                    
+                    // TODO: - insertions
+                    
+                case .error(let error) :
+                    print("error notification: \(error)")
+            }
+        })
+        
     }
 }

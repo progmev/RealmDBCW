@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D74063B2824416B002595A1 /* UITableViewCellExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D74063A2824416B002595A1 /* UITableViewCellExt.swift */; };
 		2DCD5148281B004900288BD3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD5147281B004900288BD3 /* AppDelegate.swift */; };
 		2DCD514A281B004900288BD3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD5149281B004900288BD3 /* SceneDelegate.swift */; };
 		2DCD514F281B004900288BD3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2DCD514D281B004900288BD3 /* Main.storyboard */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2D74063A2824416B002595A1 /* UITableViewCellExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewCellExt.swift; sourceTree = "<group>"; };
 		2DCD5144281B004900288BD3 /* RealmDBCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmDBCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DCD5147281B004900288BD3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2DCD5149281B004900288BD3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -49,6 +51,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2D74063928244146002595A1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2D74063A2824416B002595A1 /* UITableViewCellExt.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		2DCD513B281B004900288BD3 = {
 			isa = PBXGroup;
 			children = (
@@ -68,6 +78,7 @@
 		2DCD5146281B004900288BD3 /* RealmDBCW */ = {
 			isa = PBXGroup;
 			children = (
+				2D74063928244146002595A1 /* Extensions */,
 				2DCD516C281B0A8100288BD3 /* Managers */,
 				2DCD5161281B010600288BD3 /* Models */,
 				2DCD5163281B012300288BD3 /* Controllers */,
@@ -206,6 +217,7 @@
 				2DCD516B281B050E00288BD3 /* TasksTVC.swift in Sources */,
 				2DCD516E281B0A9A00288BD3 /* StorageManager.swift in Sources */,
 				2DCD5148281B004900288BD3 /* AppDelegate.swift in Sources */,
+				2D74063B2824416B002595A1 /* UITableViewCellExt.swift in Sources */,
 				2DCD514A281B004900288BD3 /* SceneDelegate.swift in Sources */,
 				2DCD5169281B04F400288BD3 /* TasksListsTVC.swift in Sources */,
 			);

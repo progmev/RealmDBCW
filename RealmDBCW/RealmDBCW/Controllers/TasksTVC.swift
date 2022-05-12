@@ -12,124 +12,100 @@ class TasksTVC: UITableViewController {
     
     var currentTasksList: TaskList!
     
-    private var inComlete: Results<Task>!
-    private var comletedTasks: Results<Task>!
+    private var notCompletedTasks: Results<Task>!
+    private var completedTasks: Results<Task>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = currentTasksList.name
         
-//        tasksLists = realm.objects(Task.self)
+        filteringTasks()
+        
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBarButtonSystemItemSelector))
+        self.navigationItem.setRightBarButtonItems([addButton, editButtonItem], animated: true)
+    }
+    
+    @objc private func addBarButtonSystemItemSelector() {
+        alertForAddAndUpdateTask()
     }
 
-    @IBAction func addTask(_ sender: UIBarButtonItem) {
+    private func alertForAddAndUpdateTask(_ task: Task? = nil) {
         
         let title = "New task"
-        let messege = "Plese insert new task name"
-        let buttonTitle = "Save"
+        let messege = task == nil ? "Plese insert new task name" : "Plese edit task name"
+        let buttonTitle = task == nil ? "Save" : "Update"
         
         let alert = UIAlertController(title: title, message: messege, preferredStyle: .alert)
         
+        var nameTextField: UITextField!
+        var noteTextField: UITextField!
+        
         let saveAction = UIAlertAction(title: buttonTitle, style: .default) { _ in
-            guard let textFieldName = alert.textFields?.first,
-                  let name = textFieldName.text,
-                  let textFieldNote = alert.textFields?.last,
-                  let note = textFieldNote.text else { return }
             
-            let task = Task()
-            task.name = name
-            task.note = note
+            guard let nameTask = nameTextField.text, !nameTask.isEmpty,
+                  let noteTask = noteTextField.text, !noteTask.isEmpty else { return }
             
-            StorageManager.saveNewTask(taskList: self.currentTasksList, task: task)
-            
-            self.tableView.reloadData()
-            
-//            self.tableView.insertRows(at: [IndexPath(row: self.tasksLists.count - 1, section: 0)], with: .automatic)
+            if let task = task {
+                StorageManager.editTask(task: task, nameTask: nameTask, noteTask: noteTask)
+                self.filteringTasks()
+            } else {
+                let task = Task()
+                task.name = nameTask
+                task.note = noteTask
+                StorageManager.saveNewTask(taskList: self.currentTasksList, task: task)
+                self.filteringTasks()
+            }
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
-        
         
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
         
         alert.addTextField { textField in
-            textField.placeholder = "Task name"
+            nameTextField = textField
+            nameTextField.placeholder = "Task name"
+            if let task = task {
+                nameTextField.text = task.name
+            }
         }
         alert.addTextField { textField in
-            textField.placeholder = "Task note"
+            noteTextField = textField
+            noteTextField.placeholder = "Task note"
+            if let task = task {
+                noteTextField.text = task.note
+            }
         }
-        
         present(alert, animated: true)
-        
     }
     
     
-    
+    private func filteringTasks() {
+        notCompletedTasks = currentTasksList.tasks.filter("isComplete = false")
+        completedTasks = currentTasksList.tasks.filter("isComplete = true")
+        tableView.reloadData()
+    }
     
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        0//2
+        2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        0//section == 0 ? inComlete.count : comletedTasks.count
+        section == 0 ? notCompletedTasks.count : completedTasks.count
     }
 
-    /*
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        section == 0 ? "In progress tasks" : "Comleted tasks"
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let task = indexPath.section == 0 ? notCompletedTasks[indexPath.row] : completedTasks[indexPath.row]
+        cell.textLabel?.text = task.name
+        cell.detailTextLabel?.text = task.note
         return cell
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
